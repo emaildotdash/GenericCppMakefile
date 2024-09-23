@@ -9,8 +9,9 @@ I will continue working on these Makefiles in the future and extend their functi
 
 Feel free to fork, alter and redistribute these Makefiles as you see fit. I shared it in hopes of making it easier for people to quickly get a project going, as well as to let the less experienced coders among us have a simple way into the world of C++ development on Linux.
 
-Lastly, this is my first time sharing an open-source project on the internet, so please do let me about any mistakes I may have made on the distribution or documentation side, or anywhere else really. Thank you for checking out this little project, I hope you will find it helpful.
+NOTICE: In the following weeks I plan on uploading a video explaining how to use the Makefile for those who prefer that. I will also do some testing, as I have __NOT__ tested a lot of usecases yet, so I cannot guarantee that the Makefile will work in every scenario. If you find a problem, feel free to open an issue about it.
 
+Lastly, this is my first time sharing an open-source project on the internet, so please do let me about any mistakes I may have made on the distribution or documentation side, or anywhere else really. Thank you for checking out this little project, I hope you will find it helpful.
 
 ## Capabilites
 
