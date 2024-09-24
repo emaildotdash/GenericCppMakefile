@@ -111,4 +111,4 @@ debug:
 outdir:
 	@echo $(foreach PRJ,$(ALL_PROJS),$(shell cd $(PRJ) && make -s outdir $(TARGET)) )# output files of all dependency projects
 libdir:
-	@echo $(foreach PRJ,$(ALL_PROJS),$(shell cd $(PRJ) && make -s libdir))# destinations of copied lib files
+	@echo $(foreach PRJ,$(ALL_PROJS),$(shell cd $(PRJ) && make -s libdir) )# destinations of copied lib files
