@@ -9,7 +9,7 @@ I will continue working on these Makefiles in the future and extend their functi
 
 Feel free to fork, alter and redistribute these Makefiles as you see fit. I shared it in hopes of making it easier for people to quickly get a project going, as well as to let the less experienced coders among us have a simple way into the world of C++ development on Linux.
 
-NOTICE: In the following weeks I plan on uploading a video explaining how to use the Makefile for those who prefer that. I will also do some testing, as I have __NOT__ tested a lot of use cases yet, so I cannot guarantee that the Makefile will work in every scenario. If you find a problem, feel free to open an issue about it.
+> NOTICE: In the following weeks I plan on uploading a video explaining how to use the Makefile for those who prefer that. I will also do some testing, as I have __NOT__ tested a lot of use cases yet, so I cannot guarantee that the Makefile will work in every scenario. If you find a problem, feel free to open an issue about it.
 
 Lastly, this is my first time sharing an open-source project on the internet, so please do let me about any mistakes I may have made on the distribution or documentation side, or anywhere else really. Thank you for checking out this little project, I hope you will find it helpful.
 
@@ -84,7 +84,7 @@ For simple projects utilizing MakefileGenericCpp, you need to be aware of two th
 __Firstly__, the build options of your project. These are available inside of the Makefile underneath the `### Project Specific` comment.\
 Each Option has a brief explanation beside it, so I will not go into them here. (if there is any demand for a deeper explanation here, please open an issue about it)
 
-Note: Make sure you understand the syntax for variable declarations in Make (see https://makefiletutorial.com/)
+> Note: Make sure you understand the syntax for variable declarations in Make (see https://makefiletutorial.com/)
 
 ---
 
@@ -104,10 +104,10 @@ If you scroll down, you will also find a short description next to their definit
 | `make liblist` | convenience script for Linux : will list the /lib directory |
 | `make fetch` | convenience script for updating the Makefile itself : will copy the version of the makefile stored in the ~/Templates directory if available, otherwise will create a copy there |
 
-NOTE: passing release or debug after a build call as SPECIFICALLY the second target will build the project with that in mind\
-e.g.: make all release, make static debug\
-This will work with the targets: `all`, `exec`, `dynamic`, `static`, `run`, `clean`, `clear`\
-Beware, though, that running `make clean debug` with `OPTIMIZATION := debug_nodir` will have the same effect as running `make cleanall`
+> NOTE: passing release or debug after a build call as SPECIFICALLY the second target will build the project with that in mind\
+> e.g.: make all release, make static debug\
+> This will work with the targets: `all`, `exec`, `dynamic`, `static`, `run`, `clean`, `clear`\
+> Beware, though, that running `make clean debug` with `OPTIMIZATION := debug_nodir` will have the same effect as running `make cleanall`
 
 
 ### Superprojects
@@ -137,7 +137,7 @@ As for Make targets:
 | `make fetchall` | runs fetch for all subprojects |
 | `make liblist` | convenience script for Linux : will list the /lib directory |
 
-NOTE: Passing release or debug as the second target works here in just the same way as well (see the note in the Single Projects section)
+> NOTE: Passing release or debug as the second target works here in just the same way as well (see the note in the Single Projects section)
 
 
 ### Summary
