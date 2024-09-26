@@ -1,7 +1,7 @@
 # GenericCppMakefile
 
 A pair of easy-to-use generic Makefiles to be used in C++ projects of any size on Linux.\
-They should also be cross-platform, provided they are used in a unix-like environment, but I currently do not guarantee anything besides Linux (with GNU Make) in this regard, as I have yet to test anything else.
+They should also be cross-platform, provided they are used in a Unix-like environment, but I currently do not guarantee anything besides Linux (with GNU Make) in this regard, as I have yet to test anything else.
 
 I created these Makefiles with the intent to make compiling C++ projects easier for myself, as C++ build-systems on Linux are just not as plug-and-play simple as I want them to be.
 
@@ -9,7 +9,7 @@ I will continue working on these Makefiles in the future and extend their functi
 
 Feel free to fork, alter and redistribute these Makefiles as you see fit. I shared it in hopes of making it easier for people to quickly get a project going, as well as to let the less experienced coders among us have a simple way into the world of C++ development on Linux.
 
-NOTICE: In the following weeks I plan on uploading a video explaining how to use the Makefile for those who prefer that. I will also do some testing, as I have __NOT__ tested a lot of usecases yet, so I cannot guarantee that the Makefile will work in every scenario. If you find a problem, feel free to open an issue about it.
+NOTICE: In the following weeks I plan on uploading a video explaining how to use the Makefile for those who prefer that. I will also do some testing, as I have __NOT__ tested a lot of use cases yet, so I cannot guarantee that the Makefile will work in every scenario. If you find a problem, feel free to open an issue about it.
 
 Lastly, this is my first time sharing an open-source project on the internet, so please do let me about any mistakes I may have made on the distribution or documentation side, or anywhere else really. Thank you for checking out this little project, I hope you will find it helpful.
 
@@ -28,13 +28,13 @@ Lastly, this is my first time sharing an open-source project on the internet, so
 ## Prerequisites
 
 The Makefiles depend on:
-- Basic Unix commands (cd, mv, cp, rm, ar, find, ...)
+- Bash-like shell with Unix commands (cd, mv, cp, ls, rm, pwd, mkdir, echo, ar, find, realpath, ...)
 - A version of Make (for instance: GNU Make)
 - The gcc compiler
 
 In terms of knowledge, you will need:
 - A basic understanding of shell (like how file paths work)
-- Some very rudementary knowledge about Makefiles (all you need are the basics of the syntax for variable declarations (see https://makefiletutorial.com/))
+- Some very rudimentary knowledge about Makefiles (all you need are the basics of the syntax for variable declarations (see https://makefiletutorial.com/))
 
 
 ## Usage
@@ -82,14 +82,14 @@ For simple projects utilizing MakefileGenericCpp, you need to be aware of two th
 ---
 
 __Firstly__, the build options of your project. These are available inside of the Makefile underneath the `### Project Specific` comment.\
-Each Option has a brief explanation beside it, so I will not go into them here. (if there is any demand for a deeper explanation write a message on this project)
+Each Option has a brief explanation beside it, so I will not go into them here. (if there is any demand for a deeper explanation here, please open an issue about it)
 
 Note: Make sure you understand the syntax for variable declarations in Make (see https://makefiletutorial.com/)
 
 ---
 
 __Secondly__, the available Make targets. A list of these is available at the top of the Makefile.\
-If you have no idea how make works I suggest reading into the manual (https://man.archlinux.org/man/make.1) . \
+If you have no idea how make works, I suggest reading into the manual (https://man.archlinux.org/man/make.1) . \
 If you scroll down, you will also find a short description next to their definitions, I will however explain them here:
 
 | MakefileGenericCpp Targets | Description |
@@ -101,8 +101,8 @@ If you scroll down, you will also find a short description next to their definit
 | `make cleanall` or `make clearall` | will clean up all files in the output directory |
 | `make info` | will print a brief summary of the project and related information |
 | `make package` | will copy all files required for the execution of the built project from the execution path to a separate folder, excluding any source files and the output directory |
-| `make liblist` | convenience script SPECIFICALLY for Linux : will list the /lib directory |
-| `make fetch` | convenience script for altering/updating the Makefile itself : will copy the version of the makefile stored in the ~/Templates directory if available, otherwise will create a copy there |
+| `make liblist` | convenience script for Linux : will list the /lib directory |
+| `make fetch` | convenience script for updating the Makefile itself : will copy the version of the makefile stored in the ~/Templates directory if available, otherwise will create a copy there |
 
 NOTE: passing release or debug after a build call as SPECIFICALLY the second target will build the project with that in mind\
 e.g.: make all release, make static debug\
@@ -128,11 +128,14 @@ As for Make targets:
 | MakefileGenericCppSuperproj Targets | Description |
 |---------------|---------------|
 | `make` or `make all` | will build all subprojects according to the specifications set in the beginning portion of the makefile |
-| `make run` | will build the first listed main project OR the one with the number you specify as second target (e.g. `make run 2`) |
+| `make run` | will build and run one listed main-project; if there is more than one main-proj listed, it will run a dialogue first |
+| `make runall` | will build and run all main-projects in sequence |
 | `make clean` or `make clear` | will clean up any files in the directory of the currently selected build target (release and debug directories) of all subprojects |
 | `make cleanall` or `make clearall` | will clean up all files in the output directory of all subprojects |
 | `make info` or `make list` | will print a brief summary and related information for all subprojects |
-| `make fetch` | convenience script for altering/updating the Makefile itself : will copy the version of the makefile stored in the ~/Templates directory if available, otherwise will create a copy there |
+| `make fetch` | convenience script for updating the Makefile itself : will copy the version of the makefile stored in the ~/Templates directory if available, otherwise will create a copy there |
+| `make fetchall` | runs fetch for all subprojects |
+| `make liblist` | convenience script for Linux : will list the /lib directory |
 
 NOTE: Passing release or debug as the second target works here in just the same way as well (see the note in the Single Projects section)
 

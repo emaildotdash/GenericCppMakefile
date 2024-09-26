@@ -2,28 +2,35 @@
 ## Generic Makefile for large-scale cross-platform C++ projects
 ## Author: Ádám "emaildotdash" Gutási
 ## License: MIT
-## Commands: <default>/all, run, runall, clean/clear, cleanall/clearall, list/info, fetch
+## Commands: <default>/all, run, runall, clean/clear, cleanall/clearall, list/info, fetch, fetchall, liblist
 ## Github: https://github.com/emaildotdash/GenericCppMakefile
+## Version: 2024-09-26
 ##
 ##############################################################
 
 ## superproject settings
 
-# directories of all projects that you want to compile (relative path)
+# superproject name (optional)
+SUPERPROJNAME :=
+
+# directories of all projects that you want to compile
 MAIN_SUBPROJS :=
-# directories of all projects that are strictly here as dependencies for the above projects (relative path)
+# directories of all projects that are strictly here as dependencies for the above projects
 DEP_SUBPROJS :=
 
 # decide what target you want to build for
 # choosing one will force all subprojects to use that setting
-# leaving it empty will take whatever exists (priority: release > debug) the default setting
+# leaving it empty will use whatever defaults the projects have (priority: release > debug)
 # debug / release / <empty>
 TARGET :=
 
+# WARNING: make sure there's no extra whitespace inside of any entry and following all entries
+# e.g.: "... := entry 1 entry2 " is bad; "... := entry1 entry2" is good
+
+# NOTE: file paths of projects may be either relative or absolute
+
 # NOTE: passing release or debug after a build call as SPECIFICALLY the second target will build the project with that in mind
 # e.g.: make all release, make run debug
-
-# WARNING: make sure there's no extra whitespace following any entry in this file
 
 ##############################################################
 ###################### DO NOT CHANGE #########################
@@ -31,16 +38,15 @@ TARGET :=
 THISDIR := $(shell pwd)# absolute directory of this project
 ALL_PROJS := $(MAIN_SUBPROJS) $(DEP_SUBPROJS)# all userspecified projects
 
-FOUND_PROJS := $(shell find ./* -name Makefile | grep -v "\./Makefile")# all Makefile directories found in any subdirectories
-
 DEP_OUTPUTS := $(foreach PRJ,$(DEP_SUBPROJS),$(shell cd $(PRJ) && make -s outdir $(TARGET)) )# output files of all dependency projects
-MAIN_LIB_DESTS := $(foreach PRJ,$(MAIN_SUBPROJS),$(shell cd $(PRJ) && make -s libdir))# destinations of copied lib files
 
 # set target optimization depending on 2nd target (only here for compatibility with superprojects; don't use this functionality)
 ifeq ($(word 2,$(MAKECMDGOALS)),release)
 TARGET = release
 else ifeq ($(word 2,$(MAKECMDGOALS)),debug)
 TARGET = debug
+else ifeq ($(word 2,$(MAKECMDGOALS)),debug_nodir)
+TARGET = debug_nodir
 endif
 
 # set flag to prevent the printing of directories
@@ -53,47 +59,48 @@ endif
 
 .PHONY: all
 all: $(MAIN_SUBPROJS)
-	@echo Superproject \'all\' executed!
+	@echo Superproject \'$(if $(SUPERPROJNAME),$(SUPERPROJNAME),"Unnamed Superproject")\' built!
 
 .PHONY: $(MAIN_SUBPROJS)
-$(MAIN_SUBPROJS): dep_outs # will make sure that any main subprojects are built
-	$(foreach PRJ,$(MAIN_SUBPROJS),cd $(THISDIR)/$(PRJ) && make all $(TARGET) ; )
+$(MAIN_SUBPROJS): LIB_DIR = $(shell cd $@ && make -s libdir)
 
-.PHONY: dep_outs
-dep_outs: $(DEP_OUTPUTS) # will copy over all result files of all dependencies to the main projects
-	$(foreach DIR,$(MAIN_LIB_DESTS),mkdir -p $(DIR) && cp $^ $(DIR))
+$(MAIN_SUBPROJS): $(DEP_SUBPROJS) # will make sure that any main subprojects are built
+	mkdir -p $(LIB_DIR) && cp $(DEP_OUTPUTS) $(LIB_DIR)
+	cd $@ && make all $(TARGET)
 
-.PHONY: $(DEP_OUTPUTS)
-$(DEP_OUTPUTS): # will make sure that any dependency subprojects are built
-	$(foreach PRJ,$(DEP_SUBPROJS),cd $(THISDIR)/$(PRJ) && make all $(TARGET) ; )
+.PHONY: $(DEP_SUBPROJS)
+$(DEP_SUBPROJS): # will make sure that any dependency subprojects are built
+	cd $@ && make all $(TARGET)
 
 ##############################
 # more targets
 
 .PHONY: run runall
-run: $(word $(if $(word 2,$(MAKECMDGOALS)),$(word 2,$(MAKECMDGOALS)),1), $(MAIN_SUBPROJS)) # will run the first project in the main list
-	@echo ""
-	cd $(THISDIR)/$< && make run $(TARGET)
+run: NUM = $(patsubst .tmp_make_run_num/%,%,$(wildcard .tmp_make_run_num/*))
+run: all runcheck # will run the project you choose from a dialogue
+	@rm -r .tmp_make_run_num
+	@cd $(word $(NUM),$(MAIN_SUBPROJS)) && make run $(TARGET)
 
-runall: dep_outs # will run all projects in the main list
-	$(foreach PRJ,$^,cd $(THISDIR)/$(PRJ) && make run $(TARGET) ; )
+runall: all # will run all projects in the main list
+	@$(foreach PRJ,$(MAIN_SUBPROJS),cd $(PRJ) && make run $(TARGET) ; cd $(THISDIR) ; )
 
-.PHONY: clean clear
+.PHONY: clean clear cleanall clearall
 clean: # cleans up the outputs of all subprojects
-	$(foreach PRJ,$(ALL_PROJS),cd $(THISDIR)/$(PRJ) && make clean ; )
+	$(foreach PRJ,$(ALL_PROJS),cd $(PRJ) && make clean ; cd $(THISDIR) ; )
 clear: clean
 
 cleanall: # cleans up the outputs of all subprojects
-	$(foreach PRJ,$(ALL_PROJS),cd $(THISDIR)/$(PRJ) && make cleanall ; )
+	$(foreach PRJ,$(ALL_PROJS),cd $(PRJ) && make cleanall ; cd $(THISDIR) ; )
 clearall: cleanall
 
 .PHONY: list info
 list: # lists all userspecified projects
-	@echo The following Projects are being used:
-	@$(foreach PRJ,$(ALL_PROJS:/Makefile=),cd $(THISDIR)/$(PRJ) && make info ; )
+	@echo Superproject: $(if $(SUPERPROJNAME),$(SUPERPROJNAME),Unnamed Superproject)
+	@echo Using the following subprojects:
+	@$(foreach PRJ,$(ALL_PROJS:/Makefile=),cd $(PRJ) && make info ; cd $(THISDIR) ; )
 info: list
 
-.PHONY: fetch
+.PHONY: fetch fetchall
 fetch: ~/Templates/MakefileGenericCppSuperproj # fetches the most recent version of this Makefile from ~/Templates (creates it if it doesn't exist)
 	@mv ./Makefile ./Makefile_old
 	@cp ~/Templates/MakefileGenericCppSuperproj ./Makefile
@@ -102,13 +109,29 @@ fetch: ~/Templates/MakefileGenericCppSuperproj # fetches the most recent version
 	@cp ./Makefile ~/Templates/MakefileGenericCppSuperproj
 	@echo Makefile template did not exist, so it has been created!
 
+fetchall: fetch # will run fetch in all subprojects
+	$(foreach PRJ,$(ALL_PROJS),cd $(PRJ) && make fetchall ; cd $(THISDIR) ; )
+
+.PHONY: liblist
+liblist: # lists the contents of the /lib directory for convenience
+	ls /lib
+
 ##############################
 # compatibility targets (you shouldn't necessarely use these, but I mean, you certainly can)
 
-.PHONY: debug release outdir libdir
+.PHONY: debug release outdir libdir runcheck
 release:
 debug:
 outdir:
 	@echo $(foreach PRJ,$(ALL_PROJS),$(shell cd $(PRJ) && make -s outdir $(TARGET)) )# output files of all dependency projects
 libdir:
 	@echo $(foreach PRJ,$(ALL_PROJS),$(shell cd $(PRJ) && make -s libdir) )# destinations of copied lib files
+runcheck: # TODO: this is quite an ugly implementation, but it's the only way I found that works
+ifeq ($(firstword $(MAIN_SUBPROJS)), $(lastword $(MAIN_SUBPROJS)))
+	mkdir .tmp_make_run_num && cd .tmp_make_run_num && touch 1
+else
+	@echo
+	@echo Projects: $(MAIN_SUBPROJS)
+	@echo "Type the index of the Project you want to run (1/2/3/...):"
+	-@read line && mkdir .tmp_make_run_num && cd .tmp_make_run_num && touch $$line
+endif
