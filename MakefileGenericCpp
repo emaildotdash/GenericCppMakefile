@@ -154,7 +154,7 @@ $(OBJECTS): $(OUTPUT)/%.o : %
 	$(CXX) -c $(CXXFLAGS) -MF $(@:.o=.d) $(INCDIRS) $< -o $@
 
 #################################
-# static lib (.so) target
+# dynamic lib (.so) target
 
 # object file names appended with DYNAMIC to tell them apart from non-dynamiclib object files
 # this isn't necessarely needed, but it makes it easier to tell what the project actally compiles to, considering there may be differences in compiler flags
@@ -171,7 +171,7 @@ $(DYNAMIC_OBJECTS): $(OUTPUT)/%DYNAMIC.o : %
 	$(CXX) -c -fPIC $(CXXFLAGS) -MF $(@:.o=.d) $(INCDIRS) $< -o $@
 
 #################################
-# dynamic lib (.a) target
+# static lib (.a) target
 
 # object file names appended with STATIC to tell them apart from non-staticlib object files
 # this isn't necessarely needed, but it makes it easier to tell what the project actally compiles to, considering there may be differences in compiler flags
