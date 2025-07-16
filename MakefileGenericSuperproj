@@ -1,21 +1,22 @@
 ##
-## Generic Makefile for large-scale cross-platform C++ projects
+## Generic Makefile for large-scale cross-platform (C++) projects
 ## Author: Ádám "emaildotdash" Gutási
 ## License: MIT
-## Commands: <default>/all, run, runall, clean/clear, cleanall/clearall, list/info, fetch, fetchall, liblist
+## Commands: <default>/all, run, runall, clean/clear, cleanall/clearall, list/info, fetch, fetchall
 ## Github: https://github.com/emaildotdash/GenericCppMakefile
-## Version: 2024-09-26
+## Version: 2025-07-13
 ##
 ##############################################################
 
-## superproject settings
+
+### superproject settings
 
 # superproject name (optional)
 SUPERPROJNAME :=
 
-# directories of all projects that you want to compile
+# directories of all projects that you want to compile (outputs)
 MAIN_SUBPROJS :=
-# directories of all projects that are strictly here as dependencies for the above projects
+# directories of all projects that are strictly here as dependencies for the above projects (deps)
 DEP_SUBPROJS :=
 
 # decide what target you want to build for
@@ -38,15 +39,16 @@ TARGET :=
 THISDIR := $(shell pwd)# absolute directory of this project
 ALL_PROJS := $(MAIN_SUBPROJS) $(DEP_SUBPROJS)# all userspecified projects
 
-DEP_OUTPUTS := $(foreach PRJ,$(DEP_SUBPROJS),$(shell cd $(PRJ) && make -s outdir $(TARGET)) )# output files of all dependency projects
+DEP_OUTDIRS := $(foreach PRJ,$(DEP_SUBPROJS),$(shell cd $(PRJ) && make -s outdir) )# output dirs of dep projects
+DEP_LIBDIRS := $(foreach PRJ,$(DEP_SUBPROJS),$(shell cd $(PRJ) && make -s libdir) )# library dirs of dep projects
+
+DEPS_TO_COPY := $(foreach DIR,$(DEP_OUTDIRS) $(DEP_LIBDIRS),$(wildcard $(DIR)/lib*.so) $(wildcard $(DIR)/*.dll) )# library files of all dependency projects
 
 # set target optimization depending on 2nd target (only here for compatibility with superprojects; don't use this functionality)
 ifeq ($(word 2,$(MAKECMDGOALS)),release)
 TARGET = release
 else ifeq ($(word 2,$(MAKECMDGOALS)),debug)
 TARGET = debug
-else ifeq ($(word 2,$(MAKECMDGOALS)),debug_nodir)
-TARGET = debug_nodir
 endif
 
 # set flag to prevent the printing of directories
@@ -65,7 +67,7 @@ all: $(MAIN_SUBPROJS)
 $(MAIN_SUBPROJS): LIB_DIR = $(shell cd $@ && make -s libdir)
 
 $(MAIN_SUBPROJS): $(DEP_SUBPROJS) # will make sure that any main subprojects are built
-	mkdir -p $(LIB_DIR) && cp $(DEP_OUTPUTS) $(LIB_DIR)
+	$(foreach DIR,$(LIB_DIR),$(shell mkdir -p $(DIR) && cp -a $(DEPS_TO_COPY:%=%*) $(DIR)))
 	cd $@ && make all $(TARGET)
 
 .PHONY: $(DEP_SUBPROJS)
@@ -101,37 +103,33 @@ list: # lists all userspecified projects
 info: list
 
 .PHONY: fetch fetchall
-fetch: ~/Templates/MakefileGenericCppSuperproj # fetches the most recent version of this Makefile from ~/Templates (creates it if it doesn't exist)
+fetch: ~/Templates/MakefileGenericSuperproj # fetches the most recent version of this Makefile from ~/Templates (creates it if it doesn't exist)
 	@mv ./Makefile ./Makefile_old
-	@cp ~/Templates/MakefileGenericCppSuperproj ./Makefile
+	@cp ~/Templates/MakefileGenericSuperproj ./Makefile
 	@echo Up-to-date Makefile template fetched!
-~/Templates/MakefileGenericCppSuperproj:
-	@cp ./Makefile ~/Templates/MakefileGenericCppSuperproj
+~/Templates/MakefileGenericSuperproj:
+	@cp ./Makefile ~/Templates/MakefileGenericSuperproj
 	@echo Makefile template did not exist, so it has been created!
 
 fetchall: fetch # will run fetch in all subprojects
 	$(foreach PRJ,$(ALL_PROJS),cd $(PRJ) && make fetchall ; cd $(THISDIR) ; )
 
-.PHONY: liblist
-liblist: # lists the contents of the /lib directory for convenience
-	ls /lib
-
 ##############################
 # compatibility targets (you shouldn't necessarely use these, but I mean, you certainly can)
 
 .PHONY: debug release outdir libdir runcheck
-release:
-debug:
-outdir:
-	@echo $(foreach PRJ,$(ALL_PROJS),$(shell cd $(PRJ) && make -s outdir $(TARGET)) )# output files of all dependency projects
-libdir:
-	@echo $(foreach PRJ,$(ALL_PROJS),$(shell cd $(PRJ) && make -s libdir) )# destinations of copied lib files
-runcheck: # TODO: this is quite an ugly implementation, but it's the only way I found that works
+release: # gets rid of an unwanted error message
+debug: # same as release
+outdir: # fetches output files of all dependency projects
+	@echo $(foreach PRJ,$(ALL_PROJS),$(shell cd $(PRJ) && make -s outdir) )
+libdir: # fetches destinations of copied lib files
+	@echo $(foreach PRJ,$(ALL_PROJS),$(shell cd $(PRJ) && make -s libdir) )
+runcheck: # check and decide which project to run  TODO: this is quite an ugly implementation, but it's the only way I found that works in Make
 ifeq ($(firstword $(MAIN_SUBPROJS)), $(lastword $(MAIN_SUBPROJS)))
 	mkdir .tmp_make_run_num && cd .tmp_make_run_num && touch 1
 else
 	@echo
 	@echo Projects: $(MAIN_SUBPROJS)
-	@echo "Type the index of the Project you want to run (1/2/3/...):"
+	@echo "Type the index of the Project you want to run (1/2/3/...): "
 	-@read line && mkdir .tmp_make_run_num && cd .tmp_make_run_num && touch $$line
 endif
