@@ -2,7 +2,7 @@
 ## Generic Makefile for mid-sized cross-platform C++ projects
 ## Author: Ádám "emaildotdash" Gutási
 ## License: MIT
-## Commands: <default>/all, exec, dynamic, static, run, clean/clear, cleanall/clearall, info, liblist, fetch, package
+## Commands: <default>/all, exec, dynamic, static, run, clean/clear, cleanall/clearall, info, package, fetch, snip
 ## Github: https://github.com/emaildotdash/GenericCppMakefile
 ## Version: 2025-07-13
 ##
@@ -252,10 +252,6 @@ info: # prints a neat summary of project details
 	@echo "|    source dirs: "$(SRC)
 	@echo "|------------------------------- -- -  -"
 
-.PHONY: liblist
-liblist: # lists the contents of the /lib directory for convenience
-	ls /lib
-
 .PHONY: fetch
 fetch: ~/Templates/MakefileGenericCpp # fetches the most recent version of this Makefile from ~/Templates (creates it if it doesn't exist)
 	@mv ./Makefile ./Makefile_old
@@ -266,8 +262,8 @@ fetch: ~/Templates/MakefileGenericCpp # fetches the most recent version of this 
 	@echo Makefile template did not exist, so it has been created!
 
 .PHONY: package
-package: SOURCES_HEADERS := $(foreach WRD,$(HEADER_TYPES),$(wildcard $(SRCDIRS:%=%/*$(WRD))))# finds all header files
-package: # neatly packages the built binary alongside its assets (any files in its execution path) # TODO: this is not very good
+package: PKG_CONTENT := $(filter-out $(OUTPUT_BASE) $(SRC) Makefile,$(wildcard *))
+package: # neatly packages the built binary alongside its assets (any files in its execution path excluding source dirs, output dir and the Makefile)
 	mkdir -p $(PACKAGEDIR)
 ifeq ($(TARGETTYPE),dynamiclib)
 	cp $(MAINOUT_DYNAMIC) $(PACKAGEDIR)
@@ -276,10 +272,7 @@ else ifeq ($(TARGETTYPE),staticlib)
 else
 	cp $(MAINOUT) $(PACKAGEDIR)
 endif
-	-cp -r $(EXECPATH)/* $(PACKAGEDIR)
-	-rm $(patsubst $(shell realpath $(EXECPATH))/%,$(PACKAGEDIR)/%,$(filter $(shell realpath $(EXECPATH))/%,$(foreach DIR,$(SOURCES_SRC) $(SOURCES_HEADERS),$(shell realpath $(DIR)) )))
-	-rm -r $(PACKAGEDIR)/$(OUTPUT_BASE) $(PACKAGEDIR)/$(PACKAGEDIR) $(PACKAGEDIR)/Makefile $(INCLUDEDIRS:%=$(PACKAGEDIR)/%)
-	find $(PACKAGEDIR) -type d -empty -delete
+	cp -ar $(PKG_CONTENT) $(PACKAGEDIR)
 
 .PHONY: snip
 snip: $(SNIPPETFILE)
@@ -306,7 +299,7 @@ ifeq ($(LIBRARYDIRS),)
 	@echo "MAKEFILE ERROR: The subproject called $(PROJNAME) does not have a specified local library directory."
 	@exit 201
 else
-	@echo $(PROJDIR)/$(filter-out ~/%,$(filter-out /%,$(firstword $(LIBRARYDIRS))))
+	@echo $(PROJDIR)/$(firstword $(filter-out ~/% /%,$(LIBRARYDIRS)))
 endif
 error: # does some error checking in the main targets
 ifneq ($(TARGETOPTIM),release) 

@@ -39,7 +39,7 @@ In terms of knowledge, you will need:
 
 Firstly as you will notice there are two Makefiles:
 - MakefileGenericCpp is for single projects with any number of source files
-- MakefileGenericCppSuperproj is for large scale projects that connect together any number of sub-projects
+- MakefileGenericSuperproj is for large scale projects that connect together any number of sub-projects
 This means the file Structure of a Single Project will look something like:
 ```
 Proj/
@@ -99,8 +99,8 @@ If you scroll down, you will also find a short description next to their definit
 | `make cleanall` or `make clearall` | will clean up all files in the output directory |
 | `make info` | will print a brief summary of the project and related information |
 | `make package` | will copy all files required for the execution of the built project from the execution path to a separate folder, excluding any source files and the output directory |
-| `make liblist` | convenience script for Linux : will list the /lib directory |
 | `make fetch` | convenience script for updating the Makefile itself : will copy the version of the makefile stored in the ~/Templates directory if available, otherwise will create a copy there |
+| `make snip` | will compile and run a 'snippet-file', which is a single independent code file for convenient testing |
 
 > NOTE: passing release or debug after a build call as SPECIFICALLY the second target will build the project with that in mind\
 > e.g.: make all release, make static debug\
@@ -110,7 +110,7 @@ If you scroll down, you will also find a short description next to their definit
 
 ### Superprojects
 
-Larger Superprojects utilizing MakefileGenericCppSuperproj are a relatively simple compared to Single projects, though you need to be aware of how they work before using them.
+Larger Superprojects utilizing MakefileGenericSuperproj are a relatively simple compared to Single projects, though you need to be aware of how they work before using them.
 
 Superprojects consist of main-projects and dependency-projects, where the all output files (except for static-libs) of dependency-projects are copied into all main-projects (specifically the first listed extra-library-folder).
 Thus, main-projs are effectively the outputs and you can have as many of them as you want.
@@ -123,17 +123,16 @@ There are only three build options and they're explained within the Makefile its
 
 As for Make targets:
 
-| MakefileGenericCppSuperproj Targets | Description |
+| MakefileGenericSuperproj Targets | Description |
 |---------------|---------------|
 | `make` or `make all` | will build all subprojects according to the specifications set in the beginning portion of the makefile |
 | `make run` | will build and run one listed main-project; if there is more than one main-proj listed, it will run a dialogue first |
 | `make runall` | will build and run all main-projects in sequence |
 | `make clean` or `make clear` | will clean up any files in the directory of the currently selected build target (release and debug directories) of all subprojects |
 | `make cleanall` or `make clearall` | will clean up all files in the output directory of all subprojects |
-| `make info` or `make list` | will print a brief summary and related information for all subprojects |
+| `make info` | will print a brief summary and related information for all subprojects |
 | `make fetch` | convenience script for updating the Makefile itself : will copy the version of the makefile stored in the ~/Templates directory if available, otherwise will create a copy there |
 | `make fetchall` | runs fetch for all subprojects |
-| `make liblist` | convenience script for Linux : will list the /lib directory |
 
 > NOTE: Passing release or debug as the second target works here in just the same way as well (see the note in the Single Projects section)
 

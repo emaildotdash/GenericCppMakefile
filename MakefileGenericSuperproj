@@ -2,7 +2,7 @@
 ## Generic Makefile for large-scale cross-platform (C++) projects
 ## Author: Ádám "emaildotdash" Gutási
 ## License: MIT
-## Commands: <default>/all, run, runall, clean/clear, cleanall/clearall, list/info, fetch, fetchall
+## Commands: <default>/all, run, runall, clean/clear, cleanall/clearall, info, fetch, fetchall
 ## Github: https://github.com/emaildotdash/GenericCppMakefile
 ## Version: 2025-07-13
 ##
@@ -95,12 +95,11 @@ cleanall: # cleans up the outputs of all subprojects
 	$(foreach PRJ,$(ALL_PROJS),cd $(PRJ) && make cleanall ; cd $(THISDIR) ; )
 clearall: cleanall
 
-.PHONY: list info
-list: # lists all userspecified projects
+.PHONY: info
+info: # lists all userspecified projects
 	@echo Superproject: $(if $(SUPERPROJNAME),$(SUPERPROJNAME),Unnamed Superproject)
 	@echo Using the following subprojects:
 	@$(foreach PRJ,$(ALL_PROJS:/Makefile=),cd $(PRJ) && make info ; cd $(THISDIR) ; )
-info: list
 
 .PHONY: fetch fetchall
 fetch: ~/Templates/MakefileGenericSuperproj # fetches the most recent version of this Makefile from ~/Templates (creates it if it doesn't exist)
