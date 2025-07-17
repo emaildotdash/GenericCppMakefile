@@ -44,6 +44,8 @@ DEP_LIBDIRS := $(foreach PRJ,$(DEP_SUBPROJS),$(shell cd $(PRJ) && make -s libdir
 
 DEPS_TO_COPY := $(foreach DIR,$(DEP_OUTDIRS) $(DEP_LIBDIRS),$(wildcard $(DIR)/lib*.so) $(wildcard $(DIR)/*.dll) )# library files of all dependency projects
 
+RUN_CHOICE_FILE := .tmp_make_run_num
+
 # set target optimization depending on 2nd target (only here for compatibility with superprojects; don't use this functionality)
 ifeq ($(word 2,$(MAKECMDGOALS)),release)
 TARGET = release
@@ -78,9 +80,8 @@ $(DEP_SUBPROJS): # will make sure that any dependency subprojects are built
 # more targets
 
 .PHONY: run runall
-run: NUM = $(patsubst .tmp_make_run_num/%,%,$(wildcard .tmp_make_run_num/*))
+run: NUM = $(shell cat $(RUN_CHOICE_FILE))
 run: all runcheck # will run the project you choose from a dialogue
-	@rm -r .tmp_make_run_num
 	@cd $(word $(NUM),$(MAIN_SUBPROJS)) && make run $(TARGET)
 
 runall: all # will run all projects in the main list
@@ -89,10 +90,12 @@ runall: all # will run all projects in the main list
 .PHONY: clean clear cleanall clearall
 clean: # cleans up the outputs of all subprojects
 	$(foreach PRJ,$(ALL_PROJS),cd $(PRJ) && make clean ; cd $(THISDIR) ; )
+	rm $(RUN_CHOICE_FILE)
 clear: clean
 
-cleanall: # cleans up the outputs of all subprojects
+cleanall: # cleans up the outputs of all subprojects using cleanall
 	$(foreach PRJ,$(ALL_PROJS),cd $(PRJ) && make cleanall ; cd $(THISDIR) ; )
+	rm $(RUN_CHOICE_FILE)
 clearall: cleanall
 
 .PHONY: info
@@ -123,12 +126,12 @@ outdir: # fetches output files of all dependency projects
 	@echo $(foreach PRJ,$(ALL_PROJS),$(shell cd $(PRJ) && make -s outdir) )
 libdir: # fetches destinations of copied lib files
 	@echo $(foreach PRJ,$(ALL_PROJS),$(shell cd $(PRJ) && make -s libdir) )
-runcheck: # check and decide which project to run  TODO: this is quite an ugly implementation, but it's the only way I found that works in Make
+runcheck: # check and decide which project to run
 ifeq ($(firstword $(MAIN_SUBPROJS)), $(lastword $(MAIN_SUBPROJS)))
-	mkdir .tmp_make_run_num && cd .tmp_make_run_num && touch 1
+	echo $$line > $(RUN_CHOICE_FILE)
 else
 	@echo
 	@echo Projects: $(MAIN_SUBPROJS)
 	@echo "Type the index of the Project you want to run (1/2/3/...): "
-	-@read line && mkdir .tmp_make_run_num && cd .tmp_make_run_num && touch $$line
+	-@read line && echo $$line > $(RUN_CHOICE_FILE)
 endif
