@@ -61,6 +61,8 @@ RELEASEFLAGS := -O3 -DNDBUG
 # you can make a "snippet" file that contains project independent code you may want to test
 # compile and run via "make snip"; output gets cleaned up by cleanall
 SNIPPETFILE := ./snip.cpp
+# filepaths to shell scripts that are run automatically upon compilation after any change
+TESTSCRIPTS :=
 
 
 ##############################################################
@@ -155,6 +157,7 @@ exec: error $(OUTPUT_SRCDIRS) $(MAINOUT)
 
 $(MAINOUT): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(INCDIRS) $(LIBDIRS) $(LIBS) $^ -o $@
+	$(foreach SCRIPT,$(TESTSCRIPTS),sh $(SCRIPT))
 
 $(OBJECTS): $(OUTPUT)/%.o : %
 	$(CXX) -c $(CXXFLAGS) -MF $(@:.o=.d) $(INCDIRS) $< -o $@
@@ -172,6 +175,7 @@ dynamic: error $(OUTPUT_SRCDIRS) $(MAINOUT_DYNAMIC)
 
 $(MAINOUT_DYNAMIC): $(DYNAMIC_OBJECTS)
 	$(CXX) -shared $(CXXFLAGS) $(INCDIRS) $(LIBDIRS) $(LIBS) $^ -o $@
+	$(foreach SCRIPT,$(TESTSCRIPTS),sh $(SCRIPT))
 
 $(DYNAMIC_OBJECTS): $(OUTPUT)/%DYNAMIC.o : %
 	$(CXX) -c -fPIC $(CXXFLAGS) -MF $(@:.o=.d) $(INCDIRS) $< -o $@
@@ -189,6 +193,7 @@ static: error $(OUTPUT_SRCDIRS) $(MAINOUT_STATIC)
 
 $(MAINOUT_STATIC): $(STATIC_OBJECTS)
 	ar rcs $@ $^
+	$(foreach SCRIPT,$(TESTSCRIPTS),sh $(SCRIPT))
 
 $(STATIC_OBJECTS): $(OUTPUT)/%STATIC.o : %
 	$(CXX) -c $(CXXFLAGS) -MF $(@:.o=.d) $(INCDIRS) $< -o $@
