@@ -216,10 +216,9 @@ $(OUTPUT_SRCDIRS): $(OUTPUT)
 .PHONY: run
 run: all # compiles and runs the application
 ifeq ($(TARGETTYPE),executable)
-	@echo
-	@echo ============------------ EXECUTION OF: $(if $(PROJNAME),$(PROJNAME),"Unnamed Project") ------------============
+	@echo "\n============------------ EXECUTION OF: $(if $(PROJNAME),$(PROJNAME),"Unnamed Project") ------------============"
 	cd $(EXECPATH) && $(PROJDIR)/$(MAINOUT) $(EXECARGS)
-	@echo ============------------ EXECUTION FINISHED! ------------============
+	@echo "\n============------------ EXECUTION FINISHED! ------------============"
 else
 	@echo Result compiled, but not run, as it is not an executable!
 endif
