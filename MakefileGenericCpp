@@ -20,8 +20,8 @@ MAIN := main
 SRC := src
 # execution path (where the program should be run from; exactly one)
 EXECPATH := .
-# command line arguments for when the built project is executed by 'make run'
-EXECARGS :=
+# describe how the executable is run by 'make run'; <command> gets substituted for the execution command
+EXECARGS := <command>
 
 ## build target
 # executable / dynamiclib / staticlib
@@ -216,7 +216,7 @@ $(OUTPUT_SRCDIRS): $(OUTPUT)
 run: all # compiles and runs the application
 ifeq ($(TARGETTYPE),executable)
 	@echo "\n============------------ EXECUTION OF: $(if $(PROJNAME),$(PROJNAME),"Unnamed Project") ------------============"
-	cd $(EXECPATH) && $(PROJDIR)/$(MAINOUT) $(EXECARGS)
+	cd $(EXECPATH) && $(subst <command>,$(PROJDIR)/$(MAINOUT),$(EXECARGS))
 	@echo "\n============------------ EXECUTION FINISHED! ------------============"
 else
 	@echo Result compiled, but not run, as it is not an executable!
