@@ -2,7 +2,7 @@
 ## Generic Makefile for mid-sized cross-platform C++ projects
 ## Author: Ádám "emaildotdash" Gutási
 ## License: MIT
-## Commands: <default>/all, exec, dynamic, static, run, clean/clear, cleanall/clearall, info, package, fetch, snip
+## Commands: <default>/all, exec, dynamic, static, run, runl, clean/clear, cleanall/clearall, info, package, fetch, snip
 ## Github: https://github.com/emaildotdash/GenericCppMakefile
 ##
 ##############################################################
@@ -212,17 +212,22 @@ $(OUTPUT_SRCDIRS): $(OUTPUT)
 #################################
 # more targets
 
-.PHONY: run
-run: all # compiles and runs the application
+.PHONY: run runl
+runl: # runs the last created executable if it exists
 ifeq ($(TARGETTYPE),executable)
+ifneq (,$(wildcard $(MAINOUT)))
 	@echo
 	@echo "============------------ EXECUTION OF: $(if $(PROJNAME),$(PROJNAME),"Unnamed Project") ------------============"
 	cd $(EXECPATH) && $(subst <command>,$(PROJDIR)/$(MAINOUT),$(EXECARGS))
 	@echo
 	@echo "============------------ EXECUTION FINISHED! ------------============"
 else
+	@echo No executable exists. Please compile it first.
+endif
+else
 	@echo Result compiled, but not run, as it is not an executable!
 endif
+run: all runl # compiles and runs the application
 
 .PHONY: clean clear
 clean: # cleans up any files in the directory of the current build target

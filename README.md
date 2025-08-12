@@ -94,7 +94,8 @@ If you scroll down, you will also find a short description next to their definit
 |---------------|---------------|
 | `make` or `make all` | will build the project according to the specifications set in the beginning portion of the makefile |
 | `make exec`, `make dynamic` and `make static` | will build the project as an executable, a dynamic-library and a static-library respectively |
-| `make run` | will build the project and subsequently run it if target in question is an executable |
+| `make runl` | will run the last compiled executable of the project if it exists |
+| `make run` | will build the project and subsequently run it using `runl` |
 | `make clean` or `make clear` | will clean up any files in the directory of the currently selected build target (release and debug directories) |
 | `make cleanall` or `make clearall` | will clean up all files in the output directory |
 | `make info` | will print a brief summary of the project and related information |
@@ -126,8 +127,10 @@ As for Make targets:
 | MakefileGenericSuperproj Targets | Description |
 |---------------|---------------|
 | `make` or `make all` | will build all subprojects according to the specifications set in the beginning portion of the makefile |
-| `make run` | will build and run one listed main-project; if there is more than one main-proj listed, it will run a dialogue first |
-| `make runall` | will build and run all main-projects in sequence |
+| `make runl` | will run the last compiled executable of one listed main-project; if there is more than one main-proj listed, it will run a dialogue first |
+| `make run` | will both build and then `runl` the chosen main-project |
+| `make runlall` | will run the last compiled executables of all main-projects in sequence |
+| `make runall` | will both build and then `runlall` all main-projects |
 | `make clean` or `make clear` | will clean up any files in the directory of the currently selected build target (release and debug directories) of all subprojects |
 | `make cleanall` or `make clearall` | will clean up all files in the output directory of all subprojects |
 | `make info` | will print a brief summary and related information for all subprojects |

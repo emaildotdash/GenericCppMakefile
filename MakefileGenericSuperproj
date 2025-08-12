@@ -2,7 +2,7 @@
 ## Generic Makefile for large-scale cross-platform (C++) projects
 ## Author: Ádám "emaildotdash" Gutási
 ## License: MIT
-## Commands: <default>/all, run, runall, clean/clear, cleanall/clearall, info, fetch, fetchall
+## Commands: <default>/all, run, runl, runall, runlall, clean/clear, cleanall/clearall, info, fetch, fetchall
 ## Github: https://github.com/emaildotdash/GenericCppMakefile
 ##
 ##############################################################
@@ -78,13 +78,12 @@ $(DEP_SUBPROJS): # will make sure that any dependency subprojects are built
 ##############################
 # more targets
 
-.PHONY: run runall
-run: NUM = $(shell cat $(RUN_CHOICE_FILE))
-run: all runcheck # will run the project you choose from a dialogue
-	@cd $(word $(NUM),$(MAIN_SUBPROJS)) && make run $(TARGET)
-
-runall: all # will run all projects in the main list
-	@$(foreach PRJ,$(MAIN_SUBPROJS),cd $(PRJ) && make run $(TARGET) ; cd $(THISDIR) ; )
+.PHONY: run runl runall runlall
+run: runcheck $(word $(shell cat $(RUN_CHOICE_FILE)),$(MAIN_SUBPROJS)) runactual # will run and compile the project you choose from a dialogue
+runl: runcheck runactual # will run the last compilation of the project you choose from a dialogue
+runlall: # will run the last compilation of all projects in the main list
+	@$(foreach PRJ,$(MAIN_SUBPROJS),cd $(PRJ) && make runl $(TARGET) ; cd $(THISDIR) ; )
+runall: all runlall # will run and compile all projects in the main list
 
 .PHONY: clean clear cleanall clearall
 clean: # cleans up the outputs of all subprojects
@@ -118,7 +117,7 @@ fetchall: fetch # will run fetch in all subprojects
 ##############################
 # compatibility targets (you shouldn't necessarely use these, but I mean, you certainly can)
 
-.PHONY: debug release outdir libdir runcheck
+.PHONY: debug release outdir libdir runcheck runactual
 release: # gets rid of an unwanted error message
 debug: # same as release
 outdir: # fetches output files of all dependency projects
@@ -134,3 +133,5 @@ else
 	@echo "Type the index of the Project you want to run (1/2/3/...): "
 	-@read line && echo $$line > $(RUN_CHOICE_FILE)
 endif
+runactual: # makes the run and runl targets actually run something
+	@cd $(word $(shell cat $(RUN_CHOICE_FILE)),$(MAIN_SUBPROJS)) && make runl $(TARGET)
