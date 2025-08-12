@@ -61,40 +61,40 @@ endif
 # main targets
 
 .PHONY: all
-all: $(MAIN_SUBPROJS)
+all: $(MAIN_SUBPROJS) # compiles everything
 	@echo Superproject \'$(if $(SUPERPROJNAME),$(SUPERPROJNAME),"Unnamed Superproject")\' built!
 
 .PHONY: $(MAIN_SUBPROJS)
 $(MAIN_SUBPROJS): LIB_DIR = $(shell cd $@ && make -s libdir)
 
-$(MAIN_SUBPROJS): $(DEP_SUBPROJS) # will make sure that any main subprojects are built
+$(MAIN_SUBPROJS): $(DEP_SUBPROJS) # makes sure that any main subprojects are built
 	$(foreach DIR,$(LIB_DIR),$(shell mkdir -p $(DIR) && cp -a $(DEPS_TO_COPY:%=%*) $(DIR)))
 	cd $@ && make all $(TARGET)
 
 .PHONY: $(DEP_SUBPROJS)
-$(DEP_SUBPROJS): # will make sure that any dependency subprojects are built
+$(DEP_SUBPROJS): # makes sure that any dependency subprojects are built
 	cd $@ && make all $(TARGET)
 
 ##############################
 # more targets
 
 .PHONY: run runl runall runlall
-run: runcheck $(word $(shell cat $(RUN_CHOICE_FILE)),$(MAIN_SUBPROJS)) runactual # will run and compile the project you choose from a dialogue
-runl: runcheck runactual # will run the last compilation of the project you choose from a dialogue
-runlall: # will run the last compilation of all projects in the main list
+run: runcheck $(word $(shell cat $(RUN_CHOICE_FILE)),$(MAIN_SUBPROJS)) runactual # runs and compiles the project you choose from a dialogue
+runl: runcheck runactual # runs the last compilation of the project you choose from a dialogue
+runlall: # runs the last compilation of all projects in the main list
 	@$(foreach PRJ,$(MAIN_SUBPROJS),cd $(PRJ) && make runl $(TARGET) ; cd $(THISDIR) ; )
-runall: all runlall # will run and compile all projects in the main list
+runall: all runlall # runs and compiles all projects in the main list
 
 .PHONY: clean clear cleanall clearall
 clean: # cleans up the outputs of all subprojects
 	$(foreach PRJ,$(ALL_PROJS),cd $(PRJ) && make clean ; cd $(THISDIR) ; )
 	rm $(RUN_CHOICE_FILE)
-clear: clean
+clear: clean # alternative naming for clean
 
 cleanall: # cleans up the outputs of all subprojects using cleanall
 	$(foreach PRJ,$(ALL_PROJS),cd $(PRJ) && make cleanall ; cd $(THISDIR) ; )
 	rm $(RUN_CHOICE_FILE)
-clearall: cleanall
+clearall: cleanall # alternative naming for cleanall
 
 .PHONY: info
 info: # lists all userspecified projects
