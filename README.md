@@ -92,6 +92,7 @@ If you scroll down, you will also find a short description next to their definit
 
 | MakefileGenericCpp Targets | Description |
 |---------------|---------------|
+| `make help` | will display some information on the usage of the Makefile |
 | `make` or `make all` | will build the project according to the specifications set in the beginning portion of the makefile |
 | `make exec`, `make dynamic` and `make static` | will build the project as an executable, a dynamic-library and a static-library respectively |
 | `make runl` | will run the last compiled executable of the project if it exists |
@@ -126,6 +127,7 @@ As for Make targets:
 
 | MakefileGenericSuperproj Targets | Description |
 |---------------|---------------|
+| `make help` | will display some information on the usage of the Makefile |
 | `make` or `make all` | will build all subprojects according to the specifications set in the beginning portion of the makefile |
 | `make runl` | will run the last compiled executable of one listed main-project; if there is more than one main-proj listed, it will run a dialogue first |
 | `make run` | will both build and then `runl` the chosen main-project |

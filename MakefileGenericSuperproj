@@ -2,7 +2,7 @@
 ## Generic Makefile for large-scale cross-platform (C++) projects
 ## Author: Ádám "emaildotdash" Gutási
 ## License: MIT
-## Commands: <default>/all, run, runl, runall, runlall, clean/clear, cleanall/clearall, info, fetch, fetchall
+## Targets: help, <default>/all, run, runl, runall, runlall, clean/clear, cleanall/clearall, info, fetch, fetchall
 ## Github: https://github.com/emaildotdash/GenericCppMakefile
 ##
 ##############################################################
@@ -113,6 +113,12 @@ fetch: ~/Templates/MakefileGenericSuperproj # fetches the most recent version of
 
 fetchall: fetch # will run fetch in all subprojects
 	$(foreach PRJ,$(ALL_PROJS),cd $(PRJ) && make fetchall ; cd $(THISDIR) ; )
+
+.PHONY: help
+help: COMMA = ,
+help: # prints this help page
+	@printf "Usage:  make [TARGET] [release|debug]\n\nTargets:\n"
+	@$(foreach WRD,$(filter-out <default> Targets: ##,$(subst $(COMMA),,$(subst /, ,$(shell grep \#\#\ Targets: Makefile)))), printf "   $(shell grep ^$(WRD): Makefile | tail -n 1 | sed 's/:.*#/ -/')\n" ; )
 
 ##############################
 # compatibility targets (you shouldn't necessarely use these, but I mean, you certainly can)

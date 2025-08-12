@@ -2,7 +2,7 @@
 ## Generic Makefile for mid-sized cross-platform C++ projects
 ## Author: Ádám "emaildotdash" Gutási
 ## License: MIT
-## Commands: <default>/all, exec, dynamic, static, run, runl, clean/clear, cleanall/clearall, info, package, fetch, snip
+## Targets: help, <default>/all, exec, dynamic, static, run, runl, clean/clear, cleanall/clearall, info, package, fetch, snip
 ## Github: https://github.com/emaildotdash/GenericCppMakefile
 ##
 ##############################################################
@@ -284,6 +284,11 @@ snip: $(SNIPPETFILE) # compiles and runs a codefile (snippet) that is independen
 	$(CXX) -std=c++20 -Wall -Wl,-R./lib $(INCDIRS) $(LIBDIRS) $(LIBS) $^ -o snip
 	cd $(EXECPATH) && $(PROJDIR)/snip
 
+.PHONY: help
+help: COMMA = ,
+help: # prints this help page
+	@printf "Usage:  make [TARGET] [release|debug]\n\nTargets:\n"
+	@$(foreach WRD,$(filter-out <default> Targets: ##,$(subst $(COMMA),,$(subst /, ,$(shell grep \#\#\ Targets: Makefile)))), printf "   $(shell grep ^$(WRD): Makefile | tail -n 1 | sed 's/:.*#/ -/')\n" ; )
 
 #################################
 # compatibility targets (you shouldn't necessarely use these, but I mean, you certainly can)
