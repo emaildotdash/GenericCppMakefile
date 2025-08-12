@@ -127,7 +127,7 @@ libdir: # fetches destinations of copied lib files
 	@echo $(foreach PRJ,$(ALL_PROJS),$(shell cd $(PRJ) && make -s libdir) )
 runcheck: # check and decide which project to run
 ifeq ($(firstword $(MAIN_SUBPROJS)), $(lastword $(MAIN_SUBPROJS)))
-	echo $$line > $(RUN_CHOICE_FILE)
+	echo 1 > $(RUN_CHOICE_FILE)
 else
 	@echo
 	@echo Projects: $(MAIN_SUBPROJS)
