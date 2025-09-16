@@ -215,15 +215,11 @@ $(OUTPUT_SRCDIRS): $(OUTPUT)
 .PHONY: run runl
 runl: # runs the last created executable if it exists
 ifeq ($(TARGETTYPE),executable)
-ifneq (,$(wildcard $(MAINOUT)))
 	@echo
 	@echo "============------------ EXECUTION OF: $(if $(PROJNAME),$(PROJNAME),"Unnamed Project") ------------============"
 	cd $(EXECPATH) && $(subst <command>,$(PROJDIR)/$(MAINOUT),$(EXECARGS))
 	@echo
 	@echo "============------------ EXECUTION FINISHED! ------------============"
-else
-	@echo No executable exists. Please compile it first.
-endif
 else
 	@echo Result compiled, but not run, as it is not an executable!
 endif
